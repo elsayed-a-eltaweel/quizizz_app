@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quizizz_app/presentation/widgets/gradinet_button.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -38,7 +39,7 @@ class HomePage extends StatelessWidget {
                   ),
                   child: Center(
                     child: Image.asset(
-                      "assets/books.png",
+                      "assets/images/books.png",
                       scale: 0.8,
                     ),
                   ),
@@ -76,74 +77,17 @@ class HomePage extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: TextField(
-                        decoration: InputDecoration(
-                            border: UnderlineInputBorder(),
-                            labelText: 'Enter your Name...'),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 15, horizontal: 120),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.purple,
-                            Colors.indigo,
-                          ],
-                        ),
-                      ),
-                      child: InkWell(
-                        onTap: () {},
-                        child: Text(
-                          'Play',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 15, horizontal: 80),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.purple,
-                            Colors.indigo,
-                          ],
-                        ),
-                      ),
-                      child: InkWell(
-                        onTap: () {},
-                        child: Text(
-                          'Leaderboard',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
-                    ),
+                    const Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: TextField(
+                          decoration: InputDecoration(
+                              border: UnderlineInputBorder(),
+                              labelText: 'Enter your Name...'),
+                        )),
+                    const SizedBox(height: 12),
+                    GradientButton(buttonText: 'Play', onTap: () {}),
+                    const SizedBox(height: 16),
+                    GradientButton(buttonText: 'Leaderboard', onTap: () {})
                   ],
                 ),
               ),
