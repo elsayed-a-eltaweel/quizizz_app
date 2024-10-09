@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:quizizz_app/presentation/widgets/gradinet_button.dart';
+// import 'package:get/get_core/src/get_main.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -7,93 +9,83 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Stack(
-          children: [
-            Stack(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height / 1.6,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height / 1.6,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.indigo,
-                        Colors.purple,
-                      ],
-                    ),
-                    borderRadius: BorderRadius.only(
-                      bottomRight: Radius.circular(70),
-                    ),
-                  ),
-                  child: Center(
-                    child: Image.asset(
-                      "assets/images/books.png",
-                      scale: 0.8,
-                    ),
-                  ),
-                ),
-              ],
+      child: Stack(
+        children: [
+          Container(
+            width: Get.width,
+            height: Get.height / (100 / 40),
+            color: Colors.white,
+          ),
+          Container(
+            width: Get.width,
+            height: Get.height / (100 / 40),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.indigo,
+                  Colors.purple,
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(70),
+              ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 2.666,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.purple,
-                      Colors.indigo,
-                    ],
-                  ),
+            child: Center(
+              child: Image.asset(
+                "assets/images/books.png",
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: Get.width,
+              height: Get.height / (100 / 60),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.purple,
+                    Colors.indigo,
+                  ],
                 ),
               ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 2.666,
-                padding: EdgeInsets.only(top: 4, bottom: 30),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(70),
-                  ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: Get.width,
+              height: Get.height / (100 / 60),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(70),
                 ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    const Padding(
-                        padding: EdgeInsets.all(20.0),
-                        child: TextField(
-                          decoration: InputDecoration(
-                              border: UnderlineInputBorder(),
-                              labelText: 'Enter your Name...'),
-                        )),
-                    const SizedBox(height: 12),
+                    SizedBox(height: Get.height / (100 / 7)),
+                    const TextField(
+                      decoration: InputDecoration(
+                        labelText: 'Enter your Name...',
+                        contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
                     GradientButton(buttonText: 'Play', onTap: () {}),
-                    const SizedBox(height: 16),
                     GradientButton(buttonText: 'Leaderboard', onTap: () {})
                   ],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
