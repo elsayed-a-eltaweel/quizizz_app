@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:quizizz_app/main.dart';
 import 'package:quizizz_app/models/model.dart';
+import 'package:quizizz_app/presentation/pages/dash_board_page.dart';
 import 'package:quizizz_app/presentation/pages/question_page.dart';
 import 'package:quizizz_app/presentation/widgets/gradient_button.dart';
 
@@ -103,14 +104,6 @@ class HomePage extends StatelessWidget {
                                 .eq(Player.c_name, playerNameCtrl.text)
                                 .withConverter(Player.converter);
 
-                            final playerHistory = await supabase.player_history
-                                .select()
-                                .eq(PlayerHistory.c_playerId, players.first.id)
-                                .order(PlayerHistory.c_createdAt,
-                                    ascending: false)
-                                .limit(1)
-                                .withConverter(PlayerHistory.converter);
-
                             if (players.isEmpty) {
                               players = await supabase.player
                                   .insert(
@@ -118,6 +111,13 @@ class HomePage extends StatelessWidget {
                                   .select()
                                   .withConverter(Player.converter);
                             }
+                            final playerHistory = await supabase.player_history
+                                .select()
+                                .eq(PlayerHistory.c_playerId, players.first.id)
+                                .order(PlayerHistory.c_createdAt,
+                                    ascending: false)
+                                .limit(1)
+                                .withConverter(PlayerHistory.converter);
 
                             file.write('player', players.first);
                             file.write(
@@ -132,7 +132,11 @@ class HomePage extends StatelessWidget {
                                     : null);
                           }
                         }),
-                    GradientButton(buttonText: 'Leaderboard', onTap: () {})
+                    GradientButton(
+                        buttonText: 'Leaderboard',
+                        onTap: () {
+                          Get.to(DashBoardPage());
+                        })
                   ],
                 ),
               ),

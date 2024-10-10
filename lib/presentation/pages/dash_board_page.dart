@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quizizz_app/main.dart';
+import 'package:quizizz_app/models/model.dart';
+import 'package:quizizz_app/presentation/pages/player_history_page.dart';
 
 class DashBoardPage extends StatefulWidget {
   DashBoardPage({super.key});
@@ -9,15 +12,22 @@ class DashBoardPage extends StatefulWidget {
 }
 
 class _DashBoardPageState extends State<DashBoardPage> {
+  var playersDashboard = <PlayerDashboard>[].obs;
+
   @override
   void initState() {
     super.initState();
     loadDashboard();
   }
 
-  void loadDashboard() {}
+  Future<void> loadDashboard() async {
+    final loadPlayersDashboard = await supabase.player_dashboard
+        .select()
+        .withConverter(PlayerDashboard.converter);
+    playersDashboard.value = loadPlayersDashboard;
+  }
+
   //final players = <Player>[].obs;
-  var playersDashboard = <String>['abdo', 'sayed', 'ahmed'].obs;
 
   var nameSortedAsc = false;
 
@@ -29,17 +39,12 @@ class _DashBoardPageState extends State<DashBoardPage> {
     // players.value = base;
     // playersMaster = base;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
       body: Stack(
         children: [
           Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -49,30 +54,49 @@ class _DashBoardPageState extends State<DashBoardPage> {
                 ],
               ),
             ),
-            child: Column(
-              children: [
-                Expanded(
-                  child: Obx(() {
-                    return ListView.separated(
-                        itemCount: playersDashboard.length,
-                        // addAutomaticKeepAlives: false,
-                        // cacheExtent: Get.height / 4,
-                        itemBuilder: (ctx, index) => ListTile(
-                              title: Text(
-                                playersDashboard[index],
-                                style: const TextStyle(
-                                    fontSize: 16, color: Colors.white),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: kDefaultFontSize),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Text('Dashboard',
+                          style: TextStyle(color: Colors.white, fontSize: 32)),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: kDefaultFontSize),
+                    child: Divider(thickness: 0.5),
+                  ),
+                  Expanded(
+                    child: Obx(() {
+                      return ListView.separated(
+                          itemCount: playersDashboard.length,
+                          // addAutomaticKeepAlives: false,
+                          // cacheExtent: Get.height / 4,
+                          itemBuilder: (ctx, index) => ListTile(
+                                onTap: () {
+                                  Get.to(PlayerHistoryPage(),
+                                      arguments: playersDashboard[index]);
+                                },
+                                title: Text(
+                                  playersDashboard[index].name.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 16, color: Colors.white),
+                                ),
+                                trailing: Text(
+                                  playersDashboard[index].score.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 20, color: Colors.white),
+                                ),
                               ),
-                              // trailing: Text(
-                              //   players[index].score.toString(),
-                              //   style: TextStyle(fontSize: 32, color: Colors.red),
-                              // ),
-                            ),
-                        separatorBuilder: (BuildContext context, int index) =>
-                            Divider());
-                  }),
-                ),
-              ],
+                          separatorBuilder: (BuildContext context, int index) =>
+                              const Divider());
+                    }),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
