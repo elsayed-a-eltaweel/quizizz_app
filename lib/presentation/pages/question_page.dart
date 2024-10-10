@@ -8,7 +8,7 @@ class QuestionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     QuestionController _questionController = Get.put(QuestionController());
-    QuestionController _controller = Get.put(QuestionController());
+    // QuestionController _controller = Get.put(QuestionController());
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -16,7 +16,7 @@ class QuestionPage extends StatelessWidget {
         elevation: 0,
         actions: [
           TextButton(
-              onPressed: _controller.nextQuestion,
+              onPressed: _questionController.nextQuestion,
               child: Text(
                 'skip',
                 style: TextStyle(color: Colors.white),
