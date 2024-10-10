@@ -6,19 +6,18 @@ import '../../models/Question.dart';
 import 'option.dart';
 
 class QuestionCard extends StatelessWidget {
-  const QuestionCard({super.key, required this.question});
+  QuestionCard({super.key, required this.question});
   final Question question;
+  final controller = Get.put(QuestionController());
 
   @override
   Widget build(BuildContext context) {
-    QuestionController _controller = Get.put(QuestionController());
-
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: kDefaultFontSize),
-      padding: EdgeInsets.all(kDefaultFontSize),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
@@ -29,15 +28,13 @@ class QuestionCard extends StatelessWidget {
                 .headlineSmall
                 ?.copyWith(color: Colors.black),
           ),
-          SizedBox(
-            height: kDefaultFontSize / 2,
-          ),
+          const SizedBox(height: 32),
           ...List.generate(
             question.options.length,
             (index) => Option(
               index: index,
               textOption: question.options[index],
-              press: () => _controller.checkAns(question, index),
+              press: () => controller.checkAns(question, index),
             ),
           ),
         ],

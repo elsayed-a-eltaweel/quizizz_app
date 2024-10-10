@@ -2,23 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:quizizz_app/main.dart';
 import 'package:quizizz_app/models/Question.dart';
+import 'package:quizizz_app/models/model.dart';
 import 'package:quizizz_app/presentation/pages/score_page.dart';
 
 //we use get package for our state management
-
-class QuestionController extends GetxController
-    with GetSingleTickerProviderStateMixin {
-  //lets animated our progress bar
-  late AnimationController _animationController;
-  late Animation _animation;
-  //so that we can access our animation outside
-  Animation get animation => this._animation;
-
+class QuestionController extends GetxController {
   late PageController _pageController;
-  PageController get pageController => this._pageController;
+  PageController get pageController => _pageController;
+  final file = GetStorage();
 
-  List<Question> _questions = sample_data
+  final List<Question> _questions = sample_data
       .map((question) => Question(
             id: question['id'],
             question: question['question'],
@@ -27,50 +23,67 @@ class QuestionController extends GetxController
           ))
       .toList();
 
-  List<Question> get questions => this._questions;
+  List<Question> get questions => _questions;
 
   bool _isAnswered = false;
-  bool get isAnswered => this._isAnswered;
+  bool get isAnswered => _isAnswered;
 
   late int _correctAns;
-  int get correctAns => this._correctAns;
+  int get correctAns => _correctAns;
 
   late int _selectedAns;
-  int get selectedAns => this._selectedAns;
+  int get selectedAns => _selectedAns;
 
-  RxInt _questionNumber = 1.obs;
-  RxInt get questionNumber => this._questionNumber;
+  final RxInt _questionNumber = 1.obs;
+  RxInt get questionNumber => _questionNumber;
 
   int _numOfCorrectAns = 0;
-  int get numOfCorrectAns => this._numOfCorrectAns;
+  int get numOfCorrectAns => _numOfCorrectAns;
+
+  int _resumeFrom = -1;
+  set resumeFrom(int index) => _resumeFrom = index;
+
+  PlayerHistory? _lastPlayerResult;
+  set lastPlayerHistory(PlayerHistory playerHistory) =>
+      _lastPlayerResult = playerHistory;
+
+  // final file = GetStorage();
 
   //called immediately after the widget is allocated memory
   @override
   void onInit() {
-    //our animation duration is 60s
-    //so our plan is to fill the progress bar within 60s
-    _animationController =
-        AnimationController(duration: Duration(seconds: 60), vsync: this);
-    _animation = Tween<double>(begin: 0, end: 1).animate(_animationController)
-      ..addListener(() {
-        //update like setState
-        update();
-      });
-
-    //start our animation
-    //once 60s is completed go to the next question
-    _animationController.forward().whenComplete(nextQuestion);
-
     _pageController = PageController();
     super.onInit();
+  }
+
+  @override
+  void onReady() {
+    if (_resumeFrom >= 0) {
+      _pageController.jumpToPage(_resumeFrom);
+    }
+    super.onReady();
   }
 
   //called just before the controller is deleted from memory
   @override
   void onClose() {
-    super.onClose();
-    _animationController.dispose();
+    final lastPlayerResult = file.read('player_history') != null
+        ? file.read('player_history') as PlayerHistory
+        : null;
+
+    if (lastPlayerResult != null &&
+        lastPlayerResult.resumeFrom >= 0 &&
+        isAnswered) {
+      updatePlayerHistory(
+          playerHistory: lastPlayerResult,
+          resumeIdx: _questionNumber.value - 1);
+    }
+    if (_lastPlayerResult != null && _lastPlayerResult!.resumeFrom < 0) {
+      insertPlayerHistory(resumeIdx: _questionNumber.value - 1);
+    }
     _pageController.dispose();
+
+    super.onClose();
   }
 
   void checkAns(Question question, int selectedIndex) {
@@ -81,12 +94,10 @@ class QuestionController extends GetxController
 
     if (_correctAns == _selectedAns) _numOfCorrectAns++;
 
-    //It will stop the counter
-    _animationController.stop();
     update();
 
-    //Once user select an ans after 3s it will go to the next question
-    Future.delayed(Duration(seconds: 3), () {
+    //Once user select an ans after 1s it will go to the next question
+    Future.delayed(const Duration(seconds: 1), () {
       nextQuestion();
     });
   }
@@ -95,18 +106,45 @@ class QuestionController extends GetxController
     if (_questionNumber.value != _questions.length) {
       _isAnswered = false;
       _pageController.nextPage(
-          duration: Duration(milliseconds: 250), curve: Curves.ease);
-
-      //Reset the counter
-      _animationController.reset();
-
-      //Then start it again
-      //once 60s is completed go to the next question
-      _animationController.forward().whenComplete(nextQuestion);
+          duration: const Duration(milliseconds: 250), curve: Curves.ease);
     } else {
       //Get package provide us simple way to navigate another page
-      Get.off(ScorePage());
+      // save player record to supabase
+      // final lastPlayerResult = file.read('player_history') != null
+      //     ? file.read('player_history') as PlayerHistory
+      //     : null;
+      var score = numOfCorrectAns;
+      if (_lastPlayerResult != null && _lastPlayerResult!.resumeFrom >= 0) {
+        score += _lastPlayerResult!.score;
+        updatePlayerHistory(playerHistory: _lastPlayerResult!);
+      } else {
+        insertPlayerHistory();
+      }
+
+      // print(file.read('player_id'));
+      Get.off(() => const ScorePage(), arguments: score);
     }
+  }
+
+  Future<void> updatePlayerHistory(
+      {required PlayerHistory playerHistory, int resumeIdx = -1}) async {
+    // final resumeIdx =
+    //     _resumeFrom >= 0 && _questionNumber.value < _questions.length
+    //         ? _questionNumber.value - 1
+    //         : -1;
+
+    await supabase.player_history
+        .update(PlayerHistory.update(
+            score: numOfCorrectAns + playerHistory.score,
+            resumeFrom: resumeIdx))
+        .eq(PlayerHistory.c_id, playerHistory.id);
+  }
+
+  Future<void> insertPlayerHistory({int resumeIdx = -1}) async {
+    final curPlayer = file.read('player') as Player;
+
+    await supabase.player_history.insert(PlayerHistory.insert(
+        score: numOfCorrectAns, resumeFrom: resumeIdx, playerId: curPlayer.id));
   }
 
   void updateQuestionNumber(int index) {
