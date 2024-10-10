@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class GradientButton extends StatelessWidget {
   final String buttonText;
@@ -9,9 +10,11 @@ class GradientButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 120),
+      width: Get.width,
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -25,6 +28,7 @@ class GradientButton extends StatelessWidget {
         onTap: onTap,
         child: Text(
           buttonText,
+          textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 20,
             color: Colors.white,

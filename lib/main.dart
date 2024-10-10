@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
-import 'package:quizizz_app/presentation/pages/dash_board_page.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:quizizz_app/presentation/pages/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -13,6 +14,8 @@ Future<void> main() async {
     url: dotenv.env['SUPABASE_URL'].toString(),
     anonKey: dotenv.env['SUPABASE_ANON_KEY'].toString(),
   );
+
+  await GetStorage.init();
 
   runApp(const MyApp());
 }
@@ -32,6 +35,6 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: DashBoardPage());
+        home: HomePage());
   }
 }
