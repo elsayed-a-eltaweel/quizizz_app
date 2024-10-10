@@ -17,7 +17,7 @@ class Option extends StatelessWidget {
     return GetBuilder<QuestionController>(
         init: QuestionController(),
         builder: (qnController) {
-          Color getTheRigtColor() {
+          Color getTheRightColor() {
             if (qnController.isAnswered) {
               if (index == qnController.correctAns) {
                 return Colors.green;
@@ -30,16 +30,16 @@ class Option extends StatelessWidget {
           }
 
           IconData getTheRightIcon() {
-            return getTheRigtColor() == Colors.red ? Icons.close : Icons.done;
+            return getTheRightColor() == Colors.red ? Icons.close : Icons.done;
           }
 
           return InkWell(
             onTap: press,
             child: Container(
-              margin: EdgeInsets.only(top: kDefaultFontSize),
-              padding: EdgeInsets.all(kDefaultFontSize),
+              margin: const EdgeInsets.only(top: 16),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                border: Border.all(color: getTheRigtColor()),
+                border: Border.all(color: getTheRightColor()),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Row(
@@ -47,19 +47,19 @@ class Option extends StatelessWidget {
                 children: [
                   Text(
                     '${index + 1}. $textOption',
-                    style: TextStyle(color: getTheRigtColor(), fontSize: 16),
+                    style: TextStyle(color: getTheRightColor(), fontSize: 16),
                   ),
                   Container(
                     height: 26,
                     width: 26,
                     decoration: BoxDecoration(
-                      color: getTheRigtColor() == Colors.grey
+                      color: getTheRightColor() == Colors.grey
                           ? Colors.transparent
-                          : getTheRigtColor(),
+                          : getTheRightColor(),
                       borderRadius: BorderRadius.circular(50),
-                      border: Border.all(color: getTheRigtColor()),
+                      border: Border.all(color: getTheRightColor()),
                     ),
-                    child: getTheRigtColor() == Colors.grey
+                    child: getTheRightColor() == Colors.grey
                         ? null
                         : Icon(getTheRightIcon(),
                             size: 16, color: Colors.white),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quizizz_app/presentation/controllers/question_controller.dart';
+import 'package:quizizz_app/presentation/pages/home_page.dart';
 
 class ScorePage extends StatelessWidget {
   const ScorePage({super.key});
@@ -8,14 +9,15 @@ class ScorePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     QuestionController _qnController = Get.put(QuestionController());
+    int score = Get.arguments as int;
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: [
           Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
+            width: Get.width,
+            height: Get.height,
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -28,7 +30,7 @@ class ScorePage extends StatelessWidget {
             child: SafeArea(
               child: Column(
                 children: [
-                  Spacer(flex: 3),
+                  const Spacer(flex: 3),
                   Text(
                     'Score',
                     style: Theme.of(context)
@@ -36,15 +38,31 @@ class ScorePage extends StatelessWidget {
                         .headlineLarge
                         ?.copyWith(color: Colors.white),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Text(
-                    '${_qnController.correctAns * 10}/${_qnController.questions.length * 10}',
+                    '${score * 10}/${_qnController.questions.length * 10}',
                     style: Theme.of(context)
                         .textTheme
                         .headlineMedium
                         ?.copyWith(color: Colors.white),
                   ),
-                  Spacer(flex: 3),
+                  const Spacer(flex: 3),
+                  ElevatedButton(
+                    onPressed: () {
+                      Get.off(() => HomePage());
+                    },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                        textStyle: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      'Play again',
+                    ),
+                  ),
+                  const Spacer(flex: 3),
                 ],
               ),
             ),

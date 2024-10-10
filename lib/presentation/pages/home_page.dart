@@ -1,99 +1,144 @@
 import 'package:flutter/material.dart';
-import 'package:quizizz_app/presentation/widgets/gradinet_button.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:quizizz_app/main.dart';
+import 'package:quizizz_app/models/model.dart';
+import 'package:quizizz_app/presentation/pages/question_page.dart';
+import 'package:quizizz_app/presentation/widgets/gradient_button.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final playerNameCtrl = TextEditingController();
+  final file = GetStorage();
 
+  HomePage({super.key});
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Stack(
-          children: [
-            Stack(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height / 1.6,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height / 1.6,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.indigo,
-                        Colors.purple,
-                      ],
-                    ),
-                    borderRadius: BorderRadius.only(
-                      bottomRight: Radius.circular(70),
-                    ),
-                  ),
-                  child: Center(
-                    child: Image.asset(
-                      "assets/images/books.png",
-                      scale: 0.8,
-                    ),
-                  ),
-                ),
-              ],
+      child: Stack(
+        children: [
+          Container(
+            width: Get.width,
+            height: Get.height / (100 / 40),
+            color: Colors.white,
+          ),
+          Container(
+            width: Get.width,
+            height: Get.height / (100 / 40),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.indigo,
+                  Colors.purple,
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(70),
+              ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 2.666,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.purple,
-                      Colors.indigo,
-                    ],
-                  ),
+            child: Center(
+              child: Image.asset(
+                "assets/images/books.png",
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: Get.width,
+              height: Get.height / (100 / 60),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.purple,
+                    Colors.indigo,
+                  ],
                 ),
               ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 2.666,
-                padding: EdgeInsets.only(top: 4, bottom: 30),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(70),
-                  ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: Get.width,
+              height: Get.height / (100 / 60),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(70),
                 ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    const Padding(
-                        padding: EdgeInsets.all(20.0),
-                        child: TextField(
-                          decoration: InputDecoration(
-                              border: UnderlineInputBorder(),
-                              labelText: 'Enter your Name...'),
-                        )),
-                    const SizedBox(height: 12),
-                    GradientButton(buttonText: 'Play', onTap: () {}),
-                    const SizedBox(height: 16),
+                    SizedBox(height: Get.height / (100 / 7)),
+                    TextField(
+                      controller: playerNameCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Enter your Name...',
+                        contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    GradientButton(
+                        buttonText: 'Play',
+                        onTap: () async {
+                          if (playerNameCtrl.text.isEmpty) {
+                            Fluttertoast.showToast(
+                                msg: "Please enter your name...",
+                                toastLength: Toast.LENGTH_LONG,
+                                gravity: ToastGravity.TOP,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.white,
+                                textColor: Colors.black,
+                                fontSize: 16.0);
+                          } else {
+                            var players = await supabase.player
+                                .select()
+                                .eq(Player.c_name, playerNameCtrl.text)
+                                .withConverter(Player.converter);
+
+                            final playerHistory = await supabase.player_history
+                                .select()
+                                .eq(PlayerHistory.c_playerId, players.first.id)
+                                .order(PlayerHistory.c_createdAt,
+                                    ascending: false)
+                                .limit(1)
+                                .withConverter(PlayerHistory.converter);
+
+                            if (players.isEmpty) {
+                              players = await supabase.player
+                                  .insert(
+                                      Player.insert(name: playerNameCtrl.text))
+                                  .select()
+                                  .withConverter(Player.converter);
+                            }
+
+                            file.write('player', players.first);
+                            file.write(
+                                'player_history',
+                                playerHistory.isNotEmpty
+                                    ? playerHistory.first
+                                    : null);
+
+                            Get.to(() => QuestionPage(),
+                                arguments: playerHistory.isNotEmpty
+                                    ? playerHistory.first
+                                    : null);
+                          }
+                        }),
                     GradientButton(buttonText: 'Leaderboard', onTap: () {})
                   ],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
