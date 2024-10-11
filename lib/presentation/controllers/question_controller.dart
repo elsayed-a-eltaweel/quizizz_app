@@ -73,7 +73,7 @@ class QuestionController extends GetxController {
 
     if (lastPlayerResult != null &&
         lastPlayerResult.resumeFrom >= 0 &&
-        isAnswered) {
+        _questionNumber < questions.length) {
       updatePlayerHistory(
           playerHistory: lastPlayerResult,
           resumeIdx: _questionNumber.value - 1);

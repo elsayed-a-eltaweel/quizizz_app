@@ -89,7 +89,7 @@ class HomePage extends StatelessWidget {
                     GradientButton(
                         buttonText: 'Play',
                         onTap: () async {
-                          if (playerNameCtrl.text.isEmpty) {
+                          if (playerNameCtrl.text.trim().isEmpty) {
                             Fluttertoast.showToast(
                                 msg: "Please enter your name...",
                                 toastLength: Toast.LENGTH_LONG,
@@ -101,13 +101,13 @@ class HomePage extends StatelessWidget {
                           } else {
                             var players = await supabase.player
                                 .select()
-                                .eq(Player.c_name, playerNameCtrl.text)
+                                .eq(Player.c_name, playerNameCtrl.text.trim())
                                 .withConverter(Player.converter);
 
                             if (players.isEmpty) {
                               players = await supabase.player
-                                  .insert(
-                                      Player.insert(name: playerNameCtrl.text))
+                                  .insert(Player.insert(
+                                      name: playerNameCtrl.text.trim()))
                                   .select()
                                   .withConverter(Player.converter);
                             }
