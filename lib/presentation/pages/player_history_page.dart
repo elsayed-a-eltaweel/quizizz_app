@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:quizizz_app/main.dart';
 import 'package:quizizz_app/models/model.dart';
 
@@ -26,9 +27,8 @@ class _PlayerHistoryPageState extends State<PlayerHistoryPage> {
       final tempPlayerHistory = await supabase.player_history
           .select()
           .eq(PlayerHistory.c_playerId, playerId)
+          .order(PlayerHistory.c_createdAt, ascending: false)
           .withConverter(PlayerHistory.converter);
-
-      print(tempPlayerHistory);
       playerHistory.value = tempPlayerHistory;
     }
   }
@@ -65,10 +65,9 @@ class _PlayerHistoryPageState extends State<PlayerHistoryPage> {
                           ?.copyWith(color: Colors.white),
                     )),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: kDefaultFontSize),
-                    child: const Divider(thickness: 0.5),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: kDefaultFontSize),
+                    child: Divider(thickness: 0.5),
                   ),
                   Expanded(
                     child: Obx(() {
@@ -78,12 +77,14 @@ class _PlayerHistoryPageState extends State<PlayerHistoryPage> {
                           // cacheExtent: Get.height / 4,
                           itemBuilder: (ctx, index) => ListTile(
                                 title: Text(
-                                  playerHistory[index].score.toString(),
+                                  '${(playerHistory[index].score) * 10}',
                                   style: const TextStyle(
                                       fontSize: 16, color: Colors.white),
                                 ),
                                 trailing: Text(
-                                  playerHistory[index].createdAt.toString(),
+                                  formatUtcToLocal(playerHistory[index]
+                                      .createdAt
+                                      .toString()),
                                   style: const TextStyle(
                                       fontSize: 12, color: Colors.white),
                                 ),
@@ -99,5 +100,20 @@ class _PlayerHistoryPageState extends State<PlayerHistoryPage> {
         ),
       ),
     );
+  }
+
+  String formatUtcToLocal(String utcDateTimeString) {
+    // Parse the UTC string into DateTime
+    DateTime utcDateTime = DateTime.parse(utcDateTimeString).toUtc();
+
+    // Convert UTC to Local time
+    DateTime localDateTime = utcDateTime.toLocal();
+
+    // Format the local DateTime to a readable string format, e.g., "yyyy-MM-dd HH:mm:ss"
+    // String formattedLocalTime =
+    //     localDateTime.toString(); // Customize this as per your need
+
+    final formatDate = DateFormat("dd-MM-yyyy [H:mm]").format(localDateTime);
+    return formatDate;
   }
 }
