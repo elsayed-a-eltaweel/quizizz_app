@@ -40,7 +40,7 @@ class ScorePage extends StatelessWidget {
                   ),
                   const Spacer(),
                   Text(
-                    '${score * 10}/${_qnController.questions.length * 10}',
+                    '${score * 10}/${(_qnController.questions.length) * 10}',
                     style: Theme.of(context)
                         .textTheme
                         .headlineMedium
