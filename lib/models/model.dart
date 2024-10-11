@@ -131,6 +131,12 @@ class PlayerDashboard implements SupadartClass<PlayerDashboard> {
       score: score ?? this.score,
     );
   }
+
+  // @override
+  // int compareTo(final other) {
+  //   return score! > other.score ? -1 : 1;
+  //   // throw UnimplementedError();
+  // }
 }
 
 class PlayerHistory implements SupadartClass<PlayerHistory> {

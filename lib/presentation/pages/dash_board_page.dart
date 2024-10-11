@@ -23,6 +23,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
   Future<void> loadDashboard() async {
     final loadPlayersDashboard = await supabase.player_dashboard
         .select()
+        .order(PlayerDashboard.c_score, ascending: false)
         .withConverter(PlayerDashboard.converter);
     playersDashboard.value = loadPlayersDashboard;
   }
@@ -86,7 +87,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
                                       fontSize: 16, color: Colors.white),
                                 ),
                                 trailing: Text(
-                                  playersDashboard[index].score.toString(),
+                                  '${(playersDashboard[index].score)! * 10}',
                                   style: const TextStyle(
                                       fontSize: 20, color: Colors.white),
                                 ),
