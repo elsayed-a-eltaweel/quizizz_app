@@ -40,46 +40,39 @@ class QuestionController extends GetxController {
   int _numOfCorrectAns = 0;
   int get numOfCorrectAns => _numOfCorrectAns;
 
-  int _resumeFrom = -1;
-  set resumeFrom(int index) => _resumeFrom = index;
-
   PlayerHistory? _lastPlayerResult;
   set lastPlayerHistory(PlayerHistory playerHistory) =>
       _lastPlayerResult = playerHistory;
 
-  // final file = GetStorage();
-
   //called immediately after the widget is allocated memory
   @override
   void onInit() {
-    _pageController = PageController();
     super.onInit();
+    _pageController = PageController();
   }
 
   @override
   void onReady() {
-    if (_resumeFrom >= 0) {
-      _pageController.jumpToPage(_resumeFrom);
-    }
     super.onReady();
+    if (_lastPlayerResult != null && _lastPlayerResult!.resumeFrom >= 0) {
+      _pageController.jumpToPage(_lastPlayerResult!.resumeFrom);
+    }
   }
 
   //called just before the controller is deleted from memory
   @override
   void onClose() {
-    final lastPlayerResult = file.read('player_history') != null
-        ? file.read('player_history') as PlayerHistory
-        : null;
-
-    if (lastPlayerResult != null &&
-        lastPlayerResult.resumeFrom >= 0 &&
-        _questionNumber < questions.length) {
-      updatePlayerHistory(
-          playerHistory: lastPlayerResult,
-          resumeIdx: _questionNumber.value - 1);
-    }
-    if (_lastPlayerResult != null && _lastPlayerResult!.resumeFrom < 0) {
-      insertPlayerHistory(resumeIdx: _questionNumber.value - 1);
+    if (questionNumber.value > 1) {
+      if (_lastPlayerResult != null &&
+          _lastPlayerResult!.resumeFrom >= 0 &&
+          questionNumber.value < questions.length) {
+        updatePlayerHistory(
+          playerHistory: _lastPlayerResult!,
+          resumeIdx: _questionNumber.value - 1,
+        );
+      } else {
+        insertPlayerHistory(resumeIdx: _questionNumber.value - 1);
+      }
     }
     _pageController.dispose();
 
@@ -108,11 +101,8 @@ class QuestionController extends GetxController {
       _pageController.nextPage(
           duration: const Duration(milliseconds: 250), curve: Curves.ease);
     } else {
-      //Get package provide us simple way to navigate another page
       // save player record to supabase
-      // final lastPlayerResult = file.read('player_history') != null
-      //     ? file.read('player_history') as PlayerHistory
-      //     : null;
+
       var score = numOfCorrectAns;
       if (_lastPlayerResult != null && _lastPlayerResult!.resumeFrom >= 0) {
         score += _lastPlayerResult!.score;
@@ -120,19 +110,12 @@ class QuestionController extends GetxController {
       } else {
         insertPlayerHistory();
       }
-
-      // print(file.read('player_id'));
       Get.off(() => const ScorePage(), arguments: score);
     }
   }
 
   Future<void> updatePlayerHistory(
       {required PlayerHistory playerHistory, int resumeIdx = -1}) async {
-    // final resumeIdx =
-    //     _resumeFrom >= 0 && _questionNumber.value < _questions.length
-    //         ? _questionNumber.value - 1
-    //         : -1;
-
     await supabase.player_history
         .update(PlayerHistory.update(
             score: numOfCorrectAns + playerHistory.score,
