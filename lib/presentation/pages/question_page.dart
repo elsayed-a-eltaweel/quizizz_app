@@ -14,7 +14,6 @@ class QuestionPage extends StatelessWidget {
     final lastPlayerResult =
         Get.arguments != null ? Get.arguments as PlayerHistory : null;
     if (lastPlayerResult != null) {
-      _questionController.resumeFrom = lastPlayerResult.resumeFrom;
       _questionController.lastPlayerHistory = lastPlayerResult;
     }
     return Scaffold(
